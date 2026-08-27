@@ -13,10 +13,14 @@
 #include "esp_flash.h"
 #include "esp_system.h"
 
+#include "wifi.h"
+#include "app_nvs_flash.h"
+
 void app_main(void)
 {
     printf("Hello world!\n");
-
+    App_NVS_Flash_Init();
+    App_Wifi_Init();
     /* Print chip information */
     esp_chip_info_t chip_info;
     uint32_t flash_size;
@@ -48,5 +52,5 @@ void app_main(void)
     }
     printf("Restarting now.\n");
     fflush(stdout);
-    esp_restart();
+    // esp_restart();
 }
