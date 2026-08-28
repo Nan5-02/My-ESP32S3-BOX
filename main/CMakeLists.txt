@@ -9,6 +9,7 @@ set(INCLUDE_DIRS
     "Drv"
     "App"
     "Sta"
+    "Wifi"
 )
 
 # 注册组件

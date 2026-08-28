@@ -13,7 +13,7 @@
 #include "esp_flash.h"
 #include "esp_system.h"
 
-#include "wifi.h"
+#include "app_wifi.h"
 #include "app_nvs_flash.h"
 
 void app_main(void)

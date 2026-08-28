@@ -1,17 +1,33 @@
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "esp_wifi.h"
 #include "esp_event.h"
-#include "nvs_flash.h"
 #include "esp_mac.h"
-#include "wifi.h"
+#include "app_wifi.h"
 
 #include "esp_log.h"
 static const char *TAG = "APP_WIFI";
 
-#define ESP_WIFI_SSID "ace3pro"
-#define ESP_WIFI_PASS "20040421jhb"
-#define EXAMPLE_ESP_MAXIMUM_RETRY  CONFIG_ESP_MAXIMUM_RETRY
+#define ESP_WIFI_SSID "FDQ-test"
+#define ESP_WIFI_PASS "Sene@2026"
+#define ESP_WIFI_MAXIMUM_RETRY 10
+
+static int s_retry_num = 0;
+
+static void start_scan(void)
+{
+    ESP_LOGI(TAG, "Starting Wi-Fi scan...");
+    wifi_scan_config_t scan_cfg = {
+        .ssid = NULL,
+        .bssid = NULL,
+        .channel = 0,
+        .show_hidden = true,
+        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
+        .scan_time = { .active = { .min = 100, .max = 300 } },
+    };
+    ESP_ERROR_CHECK(esp_wifi_scan_start(&scan_cfg, false));
+}
 
 static void event_handler(void *arg, esp_event_base_t event_base,
                                    int32_t event_id, void *event_data)
@@ -19,16 +35,57 @@ static void event_handler(void *arg, esp_event_base_t event_base,
     ESP_LOGI(TAG, "WiFi event received: base=%s, id=%d", event_base, event_id);
     switch (event_id)
     {
+    case WIFI_EVENT_SCAN_DONE:
+    {
+        uint16_t ap_num = 0;
+        esp_wifi_scan_get_ap_num(&ap_num);
+        if (ap_num == 0)
+        {
+            ESP_LOGW(TAG, "No APs found nearby");
+            break;
+        }
+        wifi_ap_record_t *ap_records = malloc(sizeof(wifi_ap_record_t) * ap_num);
+        if (ap_records == NULL)
+        {
+            ESP_LOGE(TAG, "malloc failed for AP records");
+            break;
+        }
+        esp_wifi_scan_get_ap_records(&ap_num, ap_records);
+        ESP_LOGI(TAG, "Scan found %u AP(s):", ap_num);
+        for (uint16_t i = 0; i < ap_num; i++)
+        {
+            ESP_LOGI(TAG, "  [%u] %s ch=%d rssi=%d",
+                     i, (char *)ap_records[i].ssid,
+                     ap_records[i].primary, ap_records[i].rssi);
+        }
+        free(ap_records);
+        ESP_LOGI(TAG, "Connecting to \"%s\"...", ESP_WIFI_SSID);
+        esp_wifi_connect();
+        break;
+    }
     case WIFI_EVENT_STA_START:
         ESP_LOGI(TAG, "WiFi STA started");
-        ESP_ERROR_CHECK(esp_wifi_connect());
+        start_scan();
         break;
     case WIFI_EVENT_STA_CONNECTED:
+        s_retry_num = 0;
         ESP_LOGI(TAG, "WiFi STA connected");
         break;
     case WIFI_EVENT_STA_DISCONNECTED:
         ESP_LOGW(TAG, "WiFi STA disconnected, reason=%d",
                  ((const wifi_event_sta_disconnected_t *)event_data)->reason);
+        if (s_retry_num < ESP_WIFI_MAXIMUM_RETRY)
+        {
+            s_retry_num++;
+            ESP_LOGI(TAG, "retrying connect to \"%s\", attempt %d/%d",
+                     ESP_WIFI_SSID, s_retry_num, ESP_WIFI_MAXIMUM_RETRY);
+            esp_wifi_connect();
+        }
+        else
+        {
+            ESP_LOGE(TAG, "failed to connect to \"%s\" after %d attempts",
+                     ESP_WIFI_SSID, ESP_WIFI_MAXIMUM_RETRY);
+        }
         break;
     case IP_EVENT_STA_GOT_IP:
         ESP_LOGI(TAG, "WiFi STA got IP: " IPSTR,
@@ -86,6 +143,8 @@ void App_Wifi_Init(void)
         },
     };
 
+    //禁用WIFI省电模式
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
     // 设置WiFi模式为STA
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     // 设置WiFi配置
