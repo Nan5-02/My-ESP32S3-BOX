@@ -9,18 +9,14 @@
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "app_memory.h"
-#include "app_wifi.h"
-#include "app_nvs_flash.h"
-#include "app_es8311.h"
-#include "drv_xl9555.h"
+#include "rtos_task.h"
+
+
+
 
 
 void app_main(void)
 {
     printf("Hello world!\n");
-    App_NVS_Flash_Init();
-    App_Wifi_Init();
-    App_ES8311_Init();
-    App_Memory_Init();
+    Rtos_Task_Create();
 }

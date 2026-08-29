@@ -11,6 +11,8 @@ set(INCLUDE_DIRS
     "Sta"
     "Wifi"
     "System"
+    "Rtos"
+    "common"
 )
 
 # 注册组件
