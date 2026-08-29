@@ -15,12 +15,14 @@
 
 #include "app_wifi.h"
 #include "app_nvs_flash.h"
+#include "app_es8311.h"
 
 void app_main(void)
 {
     printf("Hello world!\n");
     App_NVS_Flash_Init();
     App_Wifi_Init();
+    ESP_ERROR_CHECK(App_ES8311_Init());
     /* Print chip information */
     esp_chip_info_t chip_info;
     uint32_t flash_size;
