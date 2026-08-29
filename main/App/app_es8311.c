@@ -3,6 +3,7 @@
 #include "esp_log.h"
 
 #include "drv_es8311.h"
+#include "drv_xl9555.h"
 #include "app_es8311.h"
 
 static const char *TAG = "app_es8311";
@@ -12,6 +13,7 @@ static i2c_master_bus_handle_t s_i2c_bus;
 static i2s_chan_handle_t s_i2s_tx_handle;
 static i2s_chan_handle_t s_i2s_rx_handle;
 static drv_es8311_handle_t s_es8311_handle;
+static drv_xl9555_handle_t s_xl9555_handle;
 
 static esp_err_t init_i2c_bus(void)
 {
@@ -98,6 +100,13 @@ esp_err_t App_ES8311_Init(void)
         App_ES8311_Deinit();
         return ret;
     }
+
+    ret = Drv_XL9555_Init(s_i2c_bus, &s_xl9555_handle);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "XL9555 initialization failed: %s", esp_err_to_name(ret));
+        App_ES8311_Deinit();
+        return ret;
+    }
     ESP_LOGI(TAG, "ES8311 initialized successfully");
     return ESP_OK;
 }
@@ -105,6 +114,10 @@ esp_err_t App_ES8311_Init(void)
 esp_err_t App_ES8311_Deinit(void)
 {
     esp_err_t ret = ESP_OK;
+    if (s_xl9555_handle != NULL) {
+        ret = Drv_XL9555_Deinit(s_xl9555_handle);
+        s_xl9555_handle = NULL;
+    }
     if (s_es8311_handle != NULL) {
         ret = Drv_ES8311_Deinit(s_es8311_handle);
         s_es8311_handle = NULL;

@@ -6,10 +6,10 @@
 #include "driver/gpio.h"
 #include "esp_err.h"
 
-/* ESP32-S3-BOX 默认 ES8311 连线；使用其他板卡时在此处按原理图修改。 */
+/* ES8311 与 XL9555 共用的 I2C 总线；使用其他板卡时按原理图修改。 */
 #define CONFIG_APP_ES8311_I2C_PORT          I2C_NUM_0
-#define CONFIG_APP_ES8311_I2C_SDA_PIN       GPIO_NUM_8
-#define CONFIG_APP_ES8311_I2C_SCL_PIN       GPIO_NUM_18
+#define CONFIG_APP_ES8311_I2C_SDA_PIN       GPIO_NUM_48
+#define CONFIG_APP_ES8311_I2C_SCL_PIN       GPIO_NUM_45
 #define CONFIG_APP_ES8311_I2S_PORT          I2S_NUM_0
 #define CONFIG_APP_ES8311_I2S_MCLK_PIN      GPIO_NUM_2
 #define CONFIG_APP_ES8311_I2S_BCLK_PIN      GPIO_NUM_17
