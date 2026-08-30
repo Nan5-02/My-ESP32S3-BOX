@@ -10,7 +10,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "rtos_task.h"
-
+#include "i2c_bus.h"
+#include "i2s_bus.h"
 
 
 
@@ -18,5 +19,7 @@
 void app_main(void)
 {
     printf("Hello world!\n");
+    Board_I2C_Bus_Init();
+    Board_I2S_Bus_Init();
     Rtos_Task_Create();
 }

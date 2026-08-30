@@ -13,6 +13,7 @@ set(INCLUDE_DIRS
     "System"
     "Rtos"
     "common"
+    "board"
 )
 
 # 注册组件
