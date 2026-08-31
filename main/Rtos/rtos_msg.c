@@ -19,6 +19,11 @@ uint8_t Rtos_msg_create(void)
         ESP_LOGE(TAG, "STA Main Task Queue Create Fail\r\n");
         ret++;
     }
+    task_msg_queue_handle[AUDIO_TASK] = xQueueCreate(AUDIO_TASK_MSG_QUEUE_LENGTH, AUDIO_TASK_MSG_QUEUE_SIZE);
+    if (task_msg_queue_handle[AUDIO_TASK] == NULL) {
+        ESP_LOGE(TAG, "Audio Task Queue Create Fail\r\n");
+        ret++;
+    }
     return ret;
 }
 

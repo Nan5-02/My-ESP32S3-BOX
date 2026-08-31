@@ -3,6 +3,7 @@
 #include "esp_log.h"
 #include "sta_wifi.h"
 #include "sta_main.h"
+#include "sta_audio.h"
 
 static const char *TAG = "RTOS_TASK";
 
@@ -21,6 +22,9 @@ void Rtos_Task_Create(void)
     // 创建通信任务
     xTaskCreate(wifi_task, "wifi_task", WIFI_TASK_STACK_SIZE, NULL, WIFI_TASK_PRIO, NULL);
     ESP_LOGI(TAG, "Task created: wifi_task");
+
+    xTaskCreate(audio_task, "audio_task", AUDIO_TASK_STACK_SIZE, NULL, AUDIO_TASK_PRIO, NULL);
+    ESP_LOGI(TAG, "Task created: audio_task");
 
 
 }

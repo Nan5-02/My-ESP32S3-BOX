@@ -27,6 +27,7 @@ typedef enum {
 typedef enum {
     WIFI_TASK = 0,
     STAMAIN_TASK,  // sta_main模块任务
+    AUDIO_TASK,     // 音频模块任务
     TASK_TYPE_MAX,
 }TaskType_Enu;
 
@@ -46,6 +47,9 @@ typedef struct {
 
 #define STAMAIN_TASK_MSG_QUEUE_LENGTH       50
 #define STAMAIN_TASK_MSG_QUEUE_SIZE         sizeof(IO_MSG_t)
+
+#define AUDIO_TASK_MSG_QUEUE_LENGTH          50
+#define AUDIO_TASK_MSG_QUEUE_SIZE            sizeof(IO_MSG_t)
 
 uint8_t Rtos_msg_create(void);
 
