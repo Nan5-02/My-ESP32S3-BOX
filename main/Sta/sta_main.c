@@ -11,10 +11,6 @@
 void main_task(void *pvParameters)
 {
     IO_MSG_t msg;
-    
-    App_ES8311_Init();
-    App_Memory_Init();
-
     uint32_t last_tick_ms = Systime_Get_MS(0);
 
     for (;;) {

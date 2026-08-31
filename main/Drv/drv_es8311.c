@@ -65,6 +65,7 @@ esp_err_t Drv_ES8311_Init(void)
         return ESP_ERR_NO_MEM;
     }
 
+    /* 添加 I2C 设备 */
     audio_codec_i2c_cfg_t i2c_config = {
         .port = CONFIG_APP_I2C_PORT,
         .addr = ES8311_CODEC_DEFAULT_ADDR,
@@ -72,18 +73,22 @@ esp_err_t Drv_ES8311_Init(void)
     };
     context->ctrl_if = audio_codec_new_i2c_ctrl(&i2c_config);
 
+    /* 添加 I2S 设备 */
     audio_codec_i2s_cfg_t i2s_config = {
         .port = CONFIG_APP_ES8311_I2S_PORT,
         .rx_handle = rx_handle,
         .tx_handle = tx_handle,
     };
     context->data_if = audio_codec_new_i2s_data(&i2s_config);
+    
+    /* 添加 GPIO 接口 */
     const audio_codec_gpio_if_t *gpio_if = audio_codec_new_gpio();
     if (context->ctrl_if == NULL || context->data_if == NULL || gpio_if == NULL) {
         release_codec(context);
         return ESP_ERR_NO_MEM;
     }
 
+    /* 添加 ES8311 编解码器 */
     es8311_codec_cfg_t codec_config = {
         .ctrl_if = context->ctrl_if,
         .gpio_if = gpio_if,
@@ -104,6 +109,7 @@ esp_err_t Drv_ES8311_Init(void)
         return ESP_FAIL;
     }
 
+    /* 创建编解码器设备 */
     const bool input_enabled = CONFIG_APP_ES8311_WORK_MODE != ESP_CODEC_DEV_WORK_MODE_DAC;
     const bool output_enabled = CONFIG_APP_ES8311_WORK_MODE != ESP_CODEC_DEV_WORK_MODE_ADC;
     esp_codec_dev_cfg_t device_config = {
@@ -118,6 +124,7 @@ esp_err_t Drv_ES8311_Init(void)
         return ESP_ERR_NO_MEM;
     }
 
+    /* 配置采样参数 */
     esp_codec_dev_sample_info_t sample_config = {
         .bits_per_sample = CONFIG_APP_ES8311_BITS_PER_SAMPLE,
         .channel = CONFIG_APP_ES8311_CHANNEL_COUNT,

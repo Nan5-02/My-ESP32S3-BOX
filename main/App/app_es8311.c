@@ -4,6 +4,7 @@
 #include "drv_es8311.h"
 #include "drv_xl9555.h"
 #include "app_es8311.h"
+#include "app_xl9555.h"
 
 static const char *TAG = "app_es8311";
 
@@ -14,12 +15,20 @@ esp_err_t App_ES8311_Init(void)
         ESP_LOGE(TAG, "ES8311 initialization failed: %s", esp_err_to_name(ret));
         return ret;
     }
+
+    ret = App_XL9555_Set_ES8311_PA_Enable(true);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to enable ES8311 PA: %s", esp_err_to_name(ret));
+        Drv_ES8311_Deinit();
+        App_XL9555_Set_ES8311_PA_Enable(false); 
+        return ret;
+    }
     return ESP_OK;
 }
 
 esp_err_t App_ES8311_Deinit(void)
 {
-    esp_err_t ret = ESP_OK;
+    esp_err_t ret = App_XL9555_Set_ES8311_PA_Enable(false);
     esp_err_t codec_ret = Drv_ES8311_Deinit();
     return ret != ESP_OK ? ret : codec_ret;
 }
